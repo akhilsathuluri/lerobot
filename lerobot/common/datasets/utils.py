@@ -805,6 +805,7 @@ def validate_episode_buffer(episode_buffer: dict, total_episodes: int, features:
         raise ValueError("You must add one or several frames with `add_frame` before calling `add_episode`.")
 
     buffer_keys = set(episode_buffer.keys()) - {"task", "size"}
+    # buffer_keys = set(episode_buffer.keys()) - {"size"}
     if not buffer_keys == set(features):
         raise ValueError(
             f"Features from `episode_buffer` don't match the ones in `features`."

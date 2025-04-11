@@ -154,3 +154,5 @@ xarm = { features = ["xarm"], solve-group = "default" }
 [tool.pixi.dependencies]
 rerun-sdk = ">=0.22.1,<0.23"
 python = "==3.10"
+ipykernel = ">=6.29.5,<7"
+pip = ">=25.0.1,<26"

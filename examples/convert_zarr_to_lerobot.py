@@ -25,16 +25,16 @@ PUSHT_FEATURES = {
             "axes": ["x", "y", "z"],
         },
     },
-    "timestamp": {
-        "dtype": "float32",
-        "shape": (1,),
-        "names": None,
-    },
-    "task": {
-        "dtype": "string",
-        "shape": (1,),
-        "names": None,
-    },
+    # "timestamp": {
+    #     "dtype": "float32",
+    #     "shape": (1,),
+    #     "names": None,
+    # },
+    # "task": {
+    #     "dtype": "string",
+    #     "shape": (1,),
+    #     "names": None,
+    # },
     # "next.reward": {
     #     "dtype": "float32",
     #     "shape": (1,),
@@ -200,7 +200,8 @@ def main(raw_dir: Path, repo_id: str, mode: str = "image", push_to_hub: bool = F
             i = from_idx + frame_idx
             frame = {
                 "action": torch.from_numpy(action[i]),
-                "timestamp": torch.from_numpy(np.array([i], dtype=np.float32)),
+                # "timestamp": torch.from_numpy(np.array([i], dtype=np.float32)),
+                # "timestamp": torch.tensor(i, dtype=torch.float32),
                 "task": PUSHT_TASK,
                 # Shift reward and success by +1 until the last item of the episode
                 # "next.reward": reward[i + (frame_idx < num_frames - 1)],
