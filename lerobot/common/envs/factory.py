@@ -50,8 +50,8 @@ def make_env(cfg: EnvConfig, n_envs: int = 1, use_async_envs: bool = False) -> g
     if n_envs < 1:
         raise ValueError("`n_envs must be at least 1")
 
-    package_name = f"gym_{cfg.type}"
-
+    package_name = "sim_a_splat" if cfg.type == "scara" else f"gym_{cfg.type}"
+    
     try:
         importlib.import_module(package_name)
     except ModuleNotFoundError as e:

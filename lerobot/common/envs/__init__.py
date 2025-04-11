@@ -13,3 +13,4 @@
 # limitations under the License.
 
 from .configs import AlohaEnv, EnvConfig, PushtEnv, XarmEnv  # noqa: F401
+from .configs import ScaraEnv  # noqa: F401

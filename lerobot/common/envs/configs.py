@@ -154,3 +154,45 @@ class XarmEnv(EnvConfig):
             "visualization_height": self.visualization_height,
             "max_episode_steps": self.episode_length,
         }
+
+
+@EnvConfig.register_subclass("scara")
+@dataclass
+class ScaraEnv(EnvConfig):
+    task: str = "Scara-v0"
+    fps: int = 10
+    episode_length: int = 300
+    obs_type: str = "pixels_agent_pos"
+    render_mode: str = "rgb_array"
+    visualization_width: int = 240
+    visualization_height: int = 320
+    features: dict[str, PolicyFeature] = field(
+        default_factory=lambda: {
+            "action": PolicyFeature(type=FeatureType.ACTION, shape=(2,)),
+            "agent_pos": PolicyFeature(type=FeatureType.STATE, shape=(2,)),
+        }
+    )
+    features_map: dict[str, str] = field(
+        default_factory=lambda: {
+            "action": ACTION,
+            "agent_pos": OBS_ROBOT,
+            "environment_state": OBS_ENV,
+            "pixels": OBS_IMAGE,
+        }
+    )
+
+    def __post_init__(self):
+        if self.obs_type == "pixels_agent_pos":
+            self.features["pixels"] = PolicyFeature(type=FeatureType.VISUAL, shape=(384, 384, 3))
+        elif self.obs_type == "environment_state_agent_pos":
+            self.features["environment_state"] = PolicyFeature(type=FeatureType.ENV, shape=(16,))
+
+    @property
+    def gym_kwargs(self) -> dict:
+        return {
+            "obs_type": self.obs_type,
+            "render_mode": self.render_mode,
+            "visualization_width": self.visualization_width,
+            "visualization_height": self.visualization_height,
+            "max_episode_steps": self.episode_length,
+        }
