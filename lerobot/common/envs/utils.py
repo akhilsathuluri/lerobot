@@ -36,6 +36,11 @@ def preprocess_observation(observations: dict[str, np.ndarray]) -> dict[str, Ten
         Dictionary of observation batches with keys renamed to LeRobot format and values as tensors.
     """
     # map to expected inputs for the policy
+
+    # TODO: modifications for scara
+    observations['pixels'] = observations.pop('camera_1')
+    observations['agent_pos'] = observations.pop('robot_eef_pos')
+
     return_observations = {}
     if "pixels" in observations:
         if isinstance(observations["pixels"], dict):
@@ -48,6 +53,9 @@ def preprocess_observation(observations: dict[str, np.ndarray]) -> dict[str, Ten
             img = torch.from_numpy(img)
 
             # sanity check that images are channel last
+            # _, h, w, c = img.shape
+            _, c, h, w = img.shape
+            img = einops.rearrange(img, "b c h w -> b h w c").contiguous()
             _, h, w, c = img.shape
             assert c < h and c < w, f"expect channel last images, but instead got {img.shape=}"
 

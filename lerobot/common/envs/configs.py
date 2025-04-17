@@ -168,22 +168,24 @@ class ScaraEnv(EnvConfig):
     visualization_height: int = 320
     features: dict[str, PolicyFeature] = field(
         default_factory=lambda: {
-            "action": PolicyFeature(type=FeatureType.ACTION, shape=(2,)),
-            "agent_pos": PolicyFeature(type=FeatureType.STATE, shape=(2,)),
+            "action": PolicyFeature(type=FeatureType.ACTION, shape=(3,)),
+            # "agent_pos": PolicyFeature(type=FeatureType.STATE, shape=(3,)),
+            "robot_eef_pos": PolicyFeature(type=FeatureType.STATE, shape=(3,)),
         }
     )
     features_map: dict[str, str] = field(
         default_factory=lambda: {
             "action": ACTION,
-            "agent_pos": OBS_ROBOT,
-            "environment_state": OBS_ENV,
-            "pixels": OBS_IMAGE,
+            # "agent_pos": OBS_ROBOT,
+            "robot_eef_pos": OBS_ROBOT,
+            # "environment_state": OBS_ENV,
+            "camera_1": OBS_IMAGE,
         }
     )
 
     def __post_init__(self):
         if self.obs_type == "pixels_agent_pos":
-            self.features["pixels"] = PolicyFeature(type=FeatureType.VISUAL, shape=(384, 384, 3))
+            self.features["camera_1"] = PolicyFeature(type=FeatureType.VISUAL, shape=(240, 320, 3))
         elif self.obs_type == "environment_state_agent_pos":
             self.features["environment_state"] = PolicyFeature(type=FeatureType.ENV, shape=(16,))
 

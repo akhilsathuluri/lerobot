@@ -87,79 +87,12 @@ def load_raw_dataset(zarr_path: Path):
         raise e
 
     zarr_data = DiffusionPolicyReplayBuffer.copy_from_path(zarr_path)
-    # breakpoint()
     return zarr_data
 # %%
-
-def calculate_coverage(zarr_data):
-    try:
-        import pymunk
-        from gym_pusht.envs.pusht import PushTEnv, pymunk_to_shapely
-    except ModuleNotFoundError as e:
-        print("`gym_pusht` is not installed. Please install it with `pip install 'lerobot[gym_pusht]'`")
-        raise e
-
-    block_pos = zarr_data["state"][:, 2:4]
-    block_angle = zarr_data["state"][:, 4]
-
-    num_frames = len(block_pos)
-
-    coverage = np.zeros((num_frames,))
-    # 8 keypoints with 2 coords each
-    keypoints = np.zeros((num_frames, 16))
-
-    # Set x, y, theta (in radians)
-    goal_pos_angle = np.array([256, 256, np.pi / 4])
-    goal_body = PushTEnv.get_goal_pose_body(goal_pos_angle)
-
-    for i in range(num_frames):
-        space = pymunk.Space()
-        space.gravity = 0, 0
-        space.damping = 0
-
-        # Add walls.
-        walls = [
-            PushTEnv.add_segment(space, (5, 506), (5, 5), 2),
-            PushTEnv.add_segment(space, (5, 5), (506, 5), 2),
-            PushTEnv.add_segment(space, (506, 5), (506, 506), 2),
-            PushTEnv.add_segment(space, (5, 506), (506, 506), 2),
-        ]
-        space.add(*walls)
-
-        block_body, block_shapes = PushTEnv.add_tee(space, block_pos[i].tolist(), block_angle[i].item())
-        goal_geom = pymunk_to_shapely(goal_body, block_body.shapes)
-        block_geom = pymunk_to_shapely(block_body, block_body.shapes)
-        intersection_area = goal_geom.intersection(block_geom).area
-        goal_area = goal_geom.area
-        coverage[i] = intersection_area / goal_area
-        keypoints[i] = torch.from_numpy(PushTEnv.get_keypoints(block_shapes).flatten())
-
-    return coverage, keypoints
-
-
-def calculate_success(coverage: float, success_threshold: float):
-    return coverage > success_threshold
-
-
-def calculate_reward(coverage: float, success_threshold: float):
-    return np.clip(coverage / success_threshold, 0, 1)
-
-# %%
-
-# raw_dir = Path("../data/datasets/").resolve()
-# repo_id = "scara_pusht"
-# mode = "image"
-# push_to_hub = False
 
 def main(raw_dir: Path, repo_id: str, mode: str = "image", push_to_hub: bool = False):
     if mode not in ["video", "image", "keypoints"]:
         raise ValueError(mode)
-
-    # if (LEROBOT_HOME / repo_id).exists():
-    #     shutil.rmtree(LEROBOT_HOME / repo_id)
-
-    # if not raw_dir.exists():
-    #     download_raw(raw_dir, repo_id="lerobot-raw/pusht_raw")
 
     zarr_data = load_raw_dataset(zarr_path=raw_dir / "scara-push-v0-render-v0.zarr")
 
@@ -174,12 +107,6 @@ def main(raw_dir: Path, repo_id: str, mode: str = "image", push_to_hub: bool = F
         "from": np.concatenate(([0], zarr_data.meta["episode_ends"][:-1])),
         "to": zarr_data.meta["episode_ends"],
     }
-
-    # Calculate success and reward based on the overlapping area
-    # of the T-object and the T-area.
-    # coverage, keypoints = calculate_coverage(zarr_data)
-    # success = calculate_success(coverage, success_threshold=0.95)
-    # reward = calculate_reward(coverage, success_threshold=0.95)
 
     features = build_features(mode)
     dataset = LeRobotDataset.create(
