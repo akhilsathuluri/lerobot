@@ -177,3 +177,6 @@ outputs/
 *.urdf
 *.xml
 *.part
+# pixi environments
+.pixi/*
+!.pixi/config.toml

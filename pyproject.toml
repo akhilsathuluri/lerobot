@@ -77,8 +77,8 @@ dependencies = [
     "wandb>=0.20.0,<0.22.0", # TODO: Bumb dependency (compatible with protobuf)
 
     "torch>=2.2.1,<2.8.0", # TODO: Bumb dependency
-    "torchcodec>=0.2.1,<0.6.0; sys_platform != 'win32' and (sys_platform != 'linux' or (platform_machine != 'aarch64' and platform_machine != 'arm64' and platform_machine != 'armv7l')) and (sys_platform != 'darwin' or platform_machine != 'x86_64')", # TODO: Bumb dependency
-    "torchvision>=0.21.0,<0.23.0", # TODO: Bumb dependency
+    # "torchcodec>=0.2.1,<0.6.0; sys_platform != 'win32' and (sys_platform != 'linux' or (platform_machine != 'aarch64' and platform_machine != 'arm64' and platform_machine != 'armv7l')) and (sys_platform != 'darwin' or platform_machine != 'x86_64')", # TODO: Bumb dependency
+    # "torchvision>=0.21.0,<0.23.0", # TODO: Bumb dependency
 
     "draccus==0.10.0", # TODO: Remove ==
     "gymnasium>=1.0.0",
@@ -110,8 +110,8 @@ lekiwi = ["lerobot[feetech]", "pyzmq>=26.2.1,<28.0.0"]
 reachy2 = ["reachy2_sdk>=1.0.14,<1.1.0"]
 kinematics = ["lerobot[placo-dep]"]
 intelrealsense = [
-    "pyrealsense2>=2.55.1.6486,<2.57.0 ; sys_platform != 'darwin'",
-    "pyrealsense2-macosx>=2.54,<2.55.0 ; sys_platform == 'darwin'",
+    # "pyrealsense2>=2.55.1.6486,<2.57.0 ; sys_platform != 'darwin'",
+    # "pyrealsense2-macosx>=2.54,<2.55.0 ; sys_platform == 'darwin'",
 ]
 phone = ["hebi-py>=2.8.0,<2.12.0", "teleop>=0.1.0,<0.2.0"]
 
@@ -126,7 +126,7 @@ async = ["lerobot[grpcio-dep]", "matplotlib>=3.10.3,<4.0.0"]
 # Development
 dev = ["pre-commit>=3.7.0,<5.0.0", "debugpy>=1.8.1,<1.9.0", "lerobot[grpcio-dep]", "grpcio-tools==1.73.1"]
 test = ["pytest>=8.1.0,<9.0.0", "pytest-timeout>=2.4.0,<3.0.0", "pytest-cov>=5.0.0,<8.0.0", "mock-serial>=0.0.1,<0.1.0 ; sys_platform != 'win32'"]
-video_benchmark = ["scikit-image>=0.23.2,<0.26.0", "pandas>=2.2.2,<2.4.0"]
+video-benchmark = ["scikit-image>=0.23.2,<0.26.0", "pandas>=2.2.2,<2.4.0"]
 
 # Simulation
 aloha = ["gym-aloha>=0.1.2,<0.2.0"]
@@ -149,7 +149,7 @@ all = [
     "lerobot[async]",
     "lerobot[dev]",
     "lerobot[test]",
-    "lerobot[video_benchmark]",
+    "lerobot[video-benchmark]",
     "lerobot[aloha]",
     "lerobot[pusht]",
     "lerobot[phone]",
@@ -348,3 +348,40 @@ ignore_errors = false
 # [[tool.mypy.overrides]]
 # module = "lerobot.scripts.*"
 # ignore_errors = false
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-64"]
+
+[tool.pixi.pypi-dependencies]
+lerobot = { path = ".", editable = true }
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+all = { features = ["all", "dynamixel", "gamepad", "hopejr", "lekiwi", "reachy2", "kinematics", "intelrealsense", "pi", "smolvla", "hilserl", "async", "dev", "test", "video-benchmark", "aloha", "pusht", "phone", "libero", "metaworld"], solve-group = "default" }
+aloha = { features = ["aloha"], solve-group = "default" }
+async = { features = ["async", "grpcio-dep"], solve-group = "default" }
+dev = { features = ["dev", "grpcio-dep"], solve-group = "default" }
+dynamixel = { features = ["dynamixel"], solve-group = "default" }
+feetech = { features = ["feetech"], solve-group = "default" }
+gamepad = { features = ["gamepad", "pygame-dep"], solve-group = "default" }
+grpcio-dep = { features = ["grpcio-dep"], solve-group = "default" }
+hilserl = { features = ["hilserl", "transformers-dep", "grpcio-dep", "placo-dep"], solve-group = "default" }
+hopejr = { features = ["hopejr", "feetech", "pygame-dep"], solve-group = "default" }
+intelrealsense = { features = ["intelrealsense"], solve-group = "default" }
+kinematics = { features = ["kinematics", "placo-dep"], solve-group = "default" }
+lekiwi = { features = ["lekiwi", "feetech"], solve-group = "default" }
+libero = { features = ["libero", "transformers-dep"], solve-group = "default" }
+metaworld = { features = ["metaworld"], solve-group = "default" }
+phone = { features = ["phone"], solve-group = "default" }
+pi = { features = ["pi"], solve-group = "default" }
+placo-dep = { features = ["placo-dep"], solve-group = "default" }
+pusht = { features = ["pusht"], solve-group = "default" }
+pygame-dep = { features = ["pygame-dep"], solve-group = "default" }
+reachy2 = { features = ["reachy2"], solve-group = "default" }
+smolvla = { features = ["smolvla", "transformers-dep"], solve-group = "default" }
+test = { features = ["test"], solve-group = "default" }
+transformers-dep = { features = ["transformers-dep"], solve-group = "default" }
+video-benchmark = { features = ["video-benchmark"], solve-group = "default" }
+
+[tool.pixi.tasks]
